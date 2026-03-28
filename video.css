@@ -1,0 +1,267 @@
+/* -------------------------------------
+ * Serenity Video Screen Constraints
+ * ------------------------------------- */
+
+ .video-page {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden; /* Lock the viewport strictly */
+    font-family: 'Inter', sans-serif;
+    background-image: radial-gradient(circle at 50% -20%, rgba(34, 197, 94, 0.15) 0%, transparent 60%);
+}
+
+.video-layout-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Header */
+.video-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    z-index: 10;
+}
+
+.back-btn { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 0.9rem; 
+    padding: 0.6rem 1.2rem; 
+    cursor: pointer; 
+    border-radius: 20px; 
+    text-decoration: none; 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    background: rgba(0, 0, 0, 0.4); 
+    color: white;
+    transition: all 0.3s ease;
+}
+.back-btn:hover { background: rgba(34, 197, 94, 0.2); }
+
+.session-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.emotion-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #4ade80;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+}
+.emotion-indicator svg { width: 16px; height: 16px; }
+
+/* -------------------------------------
+ * Split Screen Viewport 
+ * ------------------------------------- */
+.split-screen-grid {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+    min-height: 0; 
+}
+
+.glass-panel {
+    flex: 1; /* Assign perfectly equal 50/50 sizing ratios */
+    background: rgba(10, 10, 15, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.panel-label {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.panel-label svg { width: 16px; height: 16px; color: #4ade80; }
+
+/* -------------------------------------
+ * Left Side: WebCam Feed 
+ * ------------------------------------- */
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* Ensure the mocked background poster scales naturally */
+    background: #000;
+}
+.video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    transform: scaleX(-1); /* Native human mirror scaling */
+}
+#face-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.controls-overlay {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+    z-index: 10;
+}
+.icon-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.icon-btn:hover { background: #4ade80; color: #000; border-color: #4ade80; box-shadow: 0 0 15px rgba(74, 222, 128, 0.4); }
+
+/* -------------------------------------
+ * Right Side: Interactive AI Avatar
+ * ------------------------------------- */
+.ai-panel {
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, rgba(34, 197, 94, 0.05) 0%, rgba(10, 10, 15, 0.6) 70%);
+}
+
+.serenity-orb-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.serenity-orb {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #4ade80 0%, #0ff 30%, #000 80%);
+    box-shadow: 0 0 60px rgba(74, 222, 128, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.8);
+    animation: floatOrb 6s ease-in-out infinite, pulseOrb 4s ease-in-out infinite alternate;
+    filter: blur(4px);
+}
+
+@keyframes floatOrb {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+@keyframes pulseOrb {
+    0% { transform: scale(1) translateY(0); opacity: 0.8; box-shadow: 0 0 60px rgba(74, 222, 128, 0.3); }
+    100% { transform: scale(1.05) translateY(-20px); opacity: 1; box-shadow: 0 0 90px rgba(74, 222, 128, 0.6); }
+}
+
+.chat-overlay {
+    width: 100%;
+    padding: 2rem;
+    position: absolute;
+    bottom: 0;
+    min-height: 250px;
+    /* Soft shading to block out the grid background so text is readable */
+    background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+    display: flex;
+    align-items: flex-end;
+}
+
+.transcription-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bot-text {
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--text-main);
+    line-height: 1.5;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    border-left: 3px solid #4ade80;
+    padding-left: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.5s ease;
+}
+
+.user-text {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-style: italic;
+    align-self: flex-end;
+    text-align: right;
+    transition: all 0.5s ease;
+}
+
+.voice-status {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75rem;
+    color: #4ade80;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.pulse-ring {
+    width: 10px;
+    height: 10px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: ripple 1.5s infinite;
+}
+@keyframes ripple {
+    0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+@media (max-width: 900px) {
+    .split-screen-grid { flex-direction: column; }
+    .video-layout-container { overflow-y: auto; height: auto; }
+    .glass-panel { min-height: 400px; }
+}

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serenity | AI Chatbot</title>
+    <!-- Elegant, modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Global 3D Robot Background -->
+    <div class="hero-spline">
+        <iframe 
+            src="https://my.spline.design/r4xbot-BNhQW85qmVFUi8mzkcGUlcGM/" 
+            frameborder="0" 
+            title="Serenity Robot 3D Scene">
+        </iframe>
+    </div>
+    
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-text">Serenity.</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#intelligence">Intelligence</a></li>
+            <li><a href="#about">About</a></li>
+        </ul>
+        <button class="nav-cta" onclick="toggleModal()">Get Started</button>
+    </nav>
+
+    <main class="hero">
+        <!-- Elegant background typography and badges -->
+        <div class="massive-text-container">
+            <div class="status-pill glass-pill">
+                <span class="status-dot"></span> Online
+            </div>
+            <h1 class="massive-text">SERENITY</h1>
+            <p class="hero-tagline">Advanced Emotional Intelligence</p>
+        </div>
+
+        <!-- Minimalist descriptive texts -->
+        <div class="floating-text text-left">
+            <p class="tagline">Empathetic Conversations</p>
+            <p class="description">Experience the next evolution <br> of emotional artificial intelligence.</p>
+        </div>
+
+        <div class="floating-text text-right">
+            <p class="tagline">Seamless Interaction</p>
+            <p class="description">Your digital confidant.</p>
+        </div>
+
+        <div class="trusted-section">
+            <h2>TRUSTED BY FORWARD-THINKING TEAMS</h2>
+        </div>
+    </main>
+
+    <section id="features" class="page-section">
+        <div class="container">
+            <h2 class="section-title">Core Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Cognitive Empathy</h3>
+                    <p>Serenity understands sentiment in real-time to provide contextual, human-like responses effortlessly.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Infinite Context</h3>
+                    <p>Seamlessly recall past sessions with our advanced long-term memory architecture.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Secure Architecture</h3>
+                    <p>End-to-end encryption ensures your private conversational data remains yours alone.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="intelligence" class="page-section bg-alt">
+        <div class="container">
+            <div class="intelligence-content">
+                <div class="text-block">
+                    <h2 class="section-title">Beyond Standard AI.</h2>
+                    <p class="description-long">Our proprietary emotional intelligence engine doesn't just process text; it processes nuances. By analyzing pacing, sentiment, and semantic structure, Serenity beautifully adapts its persona to align perfectly with your current state of mind.</p>
+                </div>
+                <div class="stats-block">
+                    <div class="stat">
+                        <span class="stat-number">99.8%</span>
+                        <span class="stat-label">Sentiment Accuracy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">&lt;12ms</span>
+                        <span class="stat-label">Processing Latency</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="about" class="page-section cta-section">
+        <div class="container text-center">
+            <h2 class="section-title">Ready to Converse?</h2>
+            <p class="description-long text-center fade-text">Start your first session with Serenity today.</p>
+            <button class="cta-button" onclick="toggleModal()">Get Started</button>
+        </div>
+    </footer>
+
+    <script>
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particlesArray = [];
+        let mouse = { x: null, y: null, radius: 250 }; // Larger radius for smooth warping
+
+        function resizeCanvas() {
+            pCanvas.width = window.innerWidth;
+            pCanvas.height = window.innerHeight;
+            initParticles();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor(x, y) {
+                // Original rigid grid anchor point
+                this.baseX = x;
+                this.baseY = y;
+                // Current position
+                this.x = x;
+                this.y = y;
+                this.size = 1.2; // Tiny precise dots
+                
+                // Subtle varying opacities for depth
+                const alpha = Math.random() * 0.4 + 0.1;
+                // Slight tint towards vibrant neon green to match the rest of the Serenity aesthetic
+                this.color = `rgba(74, 222, 128, ${alpha})`;
+            }
+            update() {
+                // Mouse Warp Effect
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        // Spring force: closer = stronger push
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        const pushStrength = force * 12; // How far they get pushed away
+                        
+                        // Push away from mouse
+                        this.x -= forceDirectionX * pushStrength;
+                        this.y -= forceDirectionY * pushStrength;
+                    }
+                }
+                
+                // Spring physics: Always smoothly pull back to base origin
+                this.x += (this.baseX - this.x) * 0.05;
+                this.y += (this.baseY - this.y) * 0.05;
+            }
+            draw() {
+                pCtx.beginPath();
+                pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                pCtx.fillStyle = this.color;
+                pCtx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            
+            // Create a staggered grid (Hexagonal lattice) like Stitch
+            const spacing = 35; // Distance between dots
+            let row = 0;
+            
+            // Generate grid with padding outside screen bounds for smooth edges
+            for (let y = -spacing; y < pCanvas.height + spacing; y += spacing) {
+                // Offset every other row for that organic hexagonal grid look
+                let offsetX = (row % 2 === 0) ? 0 : spacing / 2;
+                for (let x = -spacing; x < pCanvas.width + spacing; x += spacing) {
+                    particlesArray.push(new Particle(x + offsetX, y));
+                }
+                row++;
+            }
+        }
+        
+        pCanvas.width = window.innerWidth;
+        pCanvas.height = window.innerHeight;
+        initParticles();
+
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+
+    <!-- Parallax Scroll Effect -->
+    <script>
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            
+            // 1. Massive Title Container (Translates down slower than the page to float)
+            const titleContainer = document.querySelector('.massive-text-container');
+            if (titleContainer) {
+                // Note: preserving the -50% X translation required for centering
+                titleContainer.style.transform = `translate(-50%, ${scrollY * 0.4}px)`;
+                titleContainer.style.opacity = Math.max(0, 1 - scrollY / 600);
+            }
+            
+            // 2. Left Floating Text (Translates UP against the scroll for contrast)
+            const floatingLeft = document.querySelector('.text-left');
+            if (floatingLeft) {
+                floatingLeft.style.transform = `translateY(${scrollY * -0.2}px)`;
+                floatingLeft.style.opacity = Math.max(0, 1 - scrollY / 400);
+            }
+            
+            // 3. Right Floating Text (Translates UP slightly faster)
+            const floatingRight = document.querySelector('.text-right');
+            if (floatingRight) {
+                floatingRight.style.transform = `translateY(${scrollY * -0.3}px)`;
+                floatingRight.style.opacity = Math.max(0, 1 - scrollY / 400);
+            }
+            
+            // 4. Trusted Banner (Fades out quickly)
+            const trustedBanner = document.querySelector('.trusted-section');
+            if (trustedBanner) {
+                trustedBanner.style.transform = `translateY(${scrollY * 0.2}px)`;
+                trustedBanner.style.opacity = Math.max(0, 1 - scrollY / 300);
+            }
+        });
+    </script>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <span class="close-button" onclick="toggleModal()">&times;</span>
+            <h2 class="modal-title">Welcome to Serenity</h2>
+            <p class="modal-subtitle">Sign in to access your dashboard</p>
+            
+            <button class="google-btn" onclick="simulateGoogleLogin()">
+                <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Sign in with Google
+            </button>
+            
+            <div class="divider">
+                <span>or</span>
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="Enter your email">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Create or enter password">
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                <button type="submit" class="submit-btn auth-btn">Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Native Auth Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+
+        // *** USER MUST FILL THIS OUT FOR NATIVE BROWSER AGENT TESTING ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdiHKJDy4-M2e6FcKRvV0ohwV2jBFINIE",
+            authDomain: "serenity-ee50d.firebaseapp.com",
+            projectId: "serenity-ee50d",
+            storageBucket: "serenity-ee50d.firebasestorage.app",
+            messagingSenderId: "225229129136",
+            appId: "1:225229129136:web:b0908ca854c74dec4f0275"
+        };
+
+        let auth, provider;
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            provider = new GoogleAuthProvider();
+        } catch(e) {
+            console.error("Firebase unconfigured:", e);
+        }
+
+        window.toggleModal = function() {
+            const modal = document.getElementById('login-modal');
+            modal.classList.toggle('show');
+        };
+
+        window.simulateGoogleLogin = async function() {
+            if (!auth || firebaseConfig.apiKey === "YOUR_API_KEY") {
+                alert("Developer Required: You must place your Firebase Web Config object into index.html (Line 300) before we can test the OAuth popup!");
+                return;
+            }
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const idToken = await result.user.getIdToken();
+                
+                // Ping backend to save user to Firestore
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('serenity_token', idToken);
+                    localStorage.setItem('serenity_user_name', result.user.displayName);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Backend rejected Firebase token: ' + data.message);
+                }
+            } catch (error) {
+                console.error("Google Auth Flow Error:", error);
+            }
+        };
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('login-modal');
+            if (event.target == modal) {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>

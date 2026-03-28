@@ -1,0 +1,241 @@
+/* --- CHAT PAGE --- */
+.chat-page {
+    /* Locks page to viewport height, chat container handles the scrolling */
+    height: 100vh;
+    overflow: hidden; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-layout {
+    width: 100vw;
+    height: 100vh;
+    padding: 3rem 8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Liquid Glass Modal Box */
+.chat-glass-container {
+    width: 100%;
+    max-width: 1100px;
+    height: 100%;
+    
+    background: rgba(15, 15, 15, 0.45);
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Frosted rim */
+    border-radius: 20px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.03); 
+    
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header */
+.chat-header {
+    padding: 1.5rem 2.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.3); /* slightly darker liquid header */
+}
+
+.chat-brand {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+}
+
+.back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.3s;
+}
+.back-link:hover { color: #fff; }
+.back-link svg { width: 14px; height: 14px; }
+
+/* Control Buttons */
+.chat-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.glass-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-btn svg { width: 16px; height: 16px; }
+
+.glass-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
+
+/* Urgent SOS Glass button */
+.sos-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+}
+
+.sos-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+    color: #fff;
+}
+
+/* Chat History Window */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+/* Custom minimal scrollbar */
+.chat-messages::-webkit-scrollbar { width: 6px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { 
+    background: rgba(255,255,255,0.15); 
+    border-radius: 10px; 
+}
+.chat-messages::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+.message {
+    display: flex;
+    width: 100%;
+}
+
+.message.user { justify-content: flex-end; }
+.message.bot { justify-content: flex-start; }
+
+/* Liquid Glass Messages */
+.msg-glass {
+    max-width: 65%;
+    padding: 1.25rem 1.75rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    font-weight: 300;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    animation: fadeIn 0.4s ease forwards;
+}
+
+/* Robot Bubble - Cool/Dark frosted */
+.message.bot .msg-glass {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    border-bottom-left-radius: 4px; /* classic bot tail */
+    color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* User Bubble - Bright/Warm frosted */
+.message.user .msg-glass {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    border-bottom-right-radius: 4px; /* user tail */
+    color: #fff;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Custom Text Input Bar */
+.chat-input-area {
+    padding: 1.8rem 2.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    gap: 1.5rem;
+    background: rgba(0,0,0,0.3);
+    align-items: center;
+}
+
+.glass-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    padding: 1.2rem 1.8rem;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.glass-input::placeholder { color: rgba(255,255,255,0.25); }
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+.glass-submit {
+    background: rgba(255, 255, 255, 0.95);
+    color: black;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-submit svg { width: 22px; height: 22px; }
+
+.glass-submit:hover {
+    transform: scale(1.1);
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(255,255,255,0.4);
+}
+
+/* Responsive constraints */
+@media (max-width: 1024px) {
+    .chat-layout { padding: 1.5rem; }
+    .chat-glass-container { height: 100%; border-radius: 12px; }
+}
+@media (max-width: 600px) {
+    .chat-actions .glass-btn span { display: none; } /* Hide SOS text on mobile, keep logo */
+    .msg-glass { max-width: 85%; }
+}

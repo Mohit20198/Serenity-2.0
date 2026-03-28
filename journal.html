@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serenity | Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=6">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .journal-page {
+            background: #050505;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: #fff;
+        }
+
+        .journal-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 32px;
+            padding: 3rem;
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        .journal-header {
+            margin-bottom: 2rem;
+        }
+
+        .journal-prompt {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            color: #4ade80;
+            line-height: 1.3;
+        }
+
+        .journal-date {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .journal-textarea {
+            width: 100%;
+            min-height: 400px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            margin-top: 2rem;
+        }
+
+        .journal-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        .journal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .save-status {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .save-status.saving {
+            color: #4ade80;
+        }
+
+        .back-to-dash {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-to-dash:hover {
+            color: #fff;
+        }
+
+        .history-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .history-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="journal-page">
+    <nav style="width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center;">
+        <a href="dashboard.html" class="back-to-dash">
+            <i data-feather="chevron-left"></i> Back to Dashboard
+        </a>
+        <button class="history-btn">History</button>
+    </nav>
+
+    <div class="journal-container">
+        <header class="journal-header">
+            <div class="journal-date" id="current-date">Saturday, March 28</div>
+            <h1 class="journal-prompt" id="journal-prompt">How are you feeling right now?</h1>
+        </header>
+
+        <textarea id="journal-input" class="journal-textarea" placeholder="Start writing your thoughts here..."></textarea>
+
+        <footer class="journal-footer">
+            <div class="save-status" id="save-status">
+                <i data-feather="check"></i> All changes saved
+            </div>
+            <button class="glass-btn" id="finish-btn">Finish Session</button>
+        </footer>
+    </div>
+
+    <script>
+        feather.replace();
+
+        // Check Auth
+        if (!localStorage.getItem('serenity_token')) {
+            window.location.href = 'index.html';
+        }
+
+        // Set Date
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options);
+
+        // Dynamic Prompts
+        const prompts = [
+            "What's one thing that made you smile today?",
+            "What's occupying your mind right now?",
+            "If you could describe today in one word, what would it be?",
+            "What are you most grateful for this week?",
+            "How did you handle a challenge today?",
+            "What's something you're looking forward to?"
+        ];
+
+        const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+        document.getElementById('journal-prompt').innerText = randomPrompt;
+
+        // Auto-save logic
+        let saveTimeout;
+        const journalInput = document.getElementById('journal-input');
+        const saveStatus = document.getElementById('save-status');
+
+        journalInput.addEventListener('input', () => {
+            saveStatus.innerHTML = '<i data-feather="refresh-cw" class="spin"></i> Saving...';
+            saveStatus.classList.add('saving');
+            feather.replace();
+
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveEntry, 2000);
+        });
+
+        async function saveEntry() {
+            const content = journalInput.value.trim();
+            if (!content) {
+                saveStatus.innerHTML = '<i data-feather="check"></i> Ready';
+                saveStatus.classList.remove('saving');
+                feather.replace();
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('serenity_token');
+                const response = await fetch('/api/journal/entry', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        content: content,
+                        prompt: document.getElementById('journal-prompt').innerText
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    saveStatus.innerHTML = '<i data-feather="check"></i> All changes saved';
+                    saveStatus.classList.remove('saving');
+                } else {
+                    saveStatus.innerHTML = '<i data-feather="alert-circle"></i> Save failed';
+                }
+            } catch (error) {
+                saveStatus.innerHTML = '<i data-feather="alert-circle"></i> Connection error';
+            }
+            feather.replace();
+        }
+
+        document.getElementById('finish-btn').addEventListener('click', () => {
+            saveEntry().then(() => {
+                window.location.href = 'dashboard.html';
+            });
+        });
+
+    </script>
+</body>
+</html>

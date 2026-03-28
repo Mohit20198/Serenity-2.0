@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serenity | Active Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=4">
+    <link rel="stylesheet" href="chat.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="chat-page">
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- We skip the heavy Spline robot here for a cleaner chat interface to focus on text, but keep the sleek magnetic particle background -->
+
+    <div class="chat-layout">
+        <!-- Main Liquid Glass Modal -->
+        <main class="chat-glass-container">
+            <header class="chat-header">
+                <div class="chat-brand">
+                    <a href="index.html" class="back-link"><i data-feather="chevron-left"></i> Home</a>
+                    <span class="status-dot"></span> Serenity Session
+                </div>
+                <div class="chat-actions">
+                    <button class="glass-btn video-btn" title="Start Video Call"><i data-feather="video"></i></button>
+                    <button class="glass-btn sos-btn" title="Emergency Protocol"><i data-feather="alert-triangle"></i> SOS</button>
+                    <button class="glass-btn logout-btn" title="Sign Out" onclick="handleLogout()"><i data-feather="log-out"></i></button>
+                </div>
+            </header>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot">
+                    <div class="msg-glass">
+                        Greetings. I am Serenity. I'm here to listen, support, and quietly guide you through whatever is on your mind today. How are you feeling right now?
+                    </div>
+                </div>
+            </div>
+            
+            <footer class="chat-input-area">
+                <input type="text" id="chat-input" class="glass-input" placeholder="Type your message..." autocomplete="off">
+                <button id="send-btn" class="glass-submit"><i data-feather="send"></i></button>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Match the interactive particle background from index.html -->
+    <script>
+        // Check Auth Status explicitly to mimic a protected Dashboard
+        if (!localStorage.getItem('serenity_token')) {
+            window.location.href = 'index.html';
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('serenity_token');
+            localStorage.removeItem('serenity_user_name');
+            window.location.href = 'index.html';
+        }
+
+        // Initialize Feather icons
+        feather.replace();
+
+        // 1. Magnetic Grid Particle Background
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particlesArray = [];
+        let mouse = { x: null, y: null, radius: 250 };
+
+        function resizeCanvas() {
+            pCanvas.width = window.innerWidth;
+            pCanvas.height = window.innerHeight;
+            initParticles();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor(x, y) {
+                this.baseX = x;
+                this.baseY = y;
+                this.x = x;
+                this.y = y;
+                this.size = 1.2;
+                const alpha = Math.random() * 0.4 + 0.1;
+                this.color = `rgba(230, 240, 255, ${alpha})`;
+            }
+            update() {
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        const pushStrength = force * 12;
+                        this.x -= forceDirectionX * pushStrength;
+                        this.y -= forceDirectionY * pushStrength;
+                    }
+                }
+                this.x += (this.baseX - this.x) * 0.05;
+                this.y += (this.baseY - this.y) * 0.05;
+            }
+            draw() {
+                pCtx.beginPath();
+                pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                pCtx.fillStyle = this.color;
+                pCtx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const spacing = 35;
+            let row = 0;
+            for (let y = -spacing; y < pCanvas.height + spacing; y += spacing) {
+                let offsetX = (row % 2 === 0) ? 0 : spacing / 2;
+                for (let x = -spacing; x < pCanvas.width + spacing; x += spacing) {
+                    particlesArray.push(new Particle(x + offsetX, y));
+                }
+                row++;
+            }
+        }
+        
+        pCanvas.width = window.innerWidth;
+        pCanvas.height = window.innerHeight;
+        initParticles();
+
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // 2. Mock Chat Application Logic
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const messagesContainer = document.getElementById('chat-messages');
+
+        const mockResponses = [
+            "I hear you. Take a deep breath. Can you tell me a bit more about why you feel that way?",
+            "That sounds completely understandable. Healing is a fluid process.",
+            "I'm engaging my empathetic emotional protocols. I am here to fully support your perspective.",
+            "Would you like to explore that thought deeper, or over an encrypted video session?"
+        ];
+        let responseIndex = 0;
+
+        function addMessage(text, sender) {
+            const msgRow = document.createElement('div');
+            msgRow.className = `message ${sender}`;
+            
+            const msgGlass = document.createElement('div');
+            msgGlass.className = 'msg-glass';
+            msgGlass.textContent = text;
+            
+            msgRow.appendChild(msgGlass);
+            messagesContainer.appendChild(msgRow);
+            
+            // Smoothly scroll to bottom
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        async function handleSend() {
+            const text = input.value.trim();
+            if(!text) return;
+            
+            addMessage(text, 'user');
+            input.value = '';
+            
+            const typingId = 'typing-' + Date.now();
+            const msgRow = document.createElement('div');
+            msgRow.className = `message bot`;
+            msgRow.id = typingId;
+            msgRow.innerHTML = `<div class="msg-glass"><i>Serenity is thinking...</i></div>`;
+            messagesContainer.appendChild(msgRow);
+            messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'smooth' });
+
+            try {
+                const token = localStorage.getItem('serenity_token');
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                const data = await response.json();
+                document.getElementById(typingId).remove();
+                
+                if (data.success) {
+                    addMessage(data.reply, 'bot');
+                } else {
+                    addMessage("I'm sorry, my cognitive center is currently unreachable.", 'bot');
+                }
+            } catch (error) {
+                if(document.getElementById(typingId)) {
+                    document.getElementById(typingId).remove();
+                }
+                addMessage("Secure connection failed. Please try again.", 'bot');
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        input.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') handleSend();
+        });
+        
+    </script>
+</body>
+</html>
