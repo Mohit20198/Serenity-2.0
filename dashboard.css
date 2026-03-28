@@ -546,3 +546,35 @@
 .chart-wrapper { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
 .chart-wrapper canvas { width: 100% !important; height: auto !important; }
 
+/* --- SOS Settings Overlay --- */
+.sos-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: all 0.5s ease;
+    backdrop-filter: blur(20px);
+}
+.sos-overlay.show { opacity: 1; visibility: visible; }
+.sos-modal {
+    background: rgba(15,15,20,0.8); backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 24px;
+    padding: 2.5rem; max-width: 500px; width: 90%; position: relative;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+.sos-form { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 1.5rem; }
+.sos-field label {
+    display: block; font-size: 0.85rem; color: rgba(255,255,255,0.5);
+    margin-bottom: 0.4rem; font-family: 'Inter', sans-serif;
+}
+.sos-input {
+    width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    color: #fff; font-family: 'Inter', sans-serif; font-size: 0.95rem;
+    outline: none; transition: border-color 0.3s; resize: none;
+}
+.sos-input:focus { border-color: rgba(248,113,113,0.4); }
+.sos-helplines {
+    padding: 1rem; background: rgba(255,255,255,0.02);
+    border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+}
+
+

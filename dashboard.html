@@ -31,6 +31,39 @@
         </div>
     </div>
 
+    <!-- SOS Settings Modal -->
+    <div class="sos-overlay" id="sos-overlay">
+        <div class="sos-modal">
+            <button class="breathing-close" onclick="closeSosSettings()"><i data-feather="x"></i></button>
+            <h2 class="breathing-title" style="color:#f87171;">🆘 SOS Settings</h2>
+            <p class="breathing-subtitle">Set up your emergency contacts and preferences</p>
+            <div class="sos-form">
+                <div class="sos-field">
+                    <label>Emergency Contact Name</label>
+                    <input type="text" id="sos-contact-name" placeholder="e.g. Mom, Dad, Friend" class="sos-input">
+                </div>
+                <div class="sos-field">
+                    <label>Emergency Phone Number</label>
+                    <input type="tel" id="sos-contact-phone" placeholder="+91 98765 43210" class="sos-input">
+                </div>
+                <div class="sos-field">
+                    <label>Custom Message (sent when SOS is triggered)</label>
+                    <textarea id="sos-message" class="sos-input" rows="3" placeholder="I need help. Please check on me."></textarea>
+                </div>
+                <div class="sos-helplines">
+                    <h4 style="margin-bottom:0.8rem;color:rgba(255,255,255,0.8);">Crisis Helplines</h4>
+                    <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:1.8;">
+                        🇮🇳 Vandrevala Foundation: <strong style="color:#4ade80">1860-2662-345</strong><br>
+                        🇮🇳 iCALL: <strong style="color:#4ade80">9152987821</strong><br>
+                        🇺🇸 Suicide & Crisis Lifeline: <strong style="color:#4ade80">988</strong><br>
+                        🌍 Crisis Text Line: Text <strong style="color:#4ade80">HOME</strong> to <strong style="color:#4ade80">741741</strong>
+                    </p>
+                </div>
+                <button class="btn-primary-green w-100" onclick="saveSosSettings()" style="margin-top:1rem;">Save SOS Settings</button>
+            </div>
+        </div>
+    </div>
+
     <div class="dashboard-container">
         <!-- Header -->
         <header class="dash-header flex-between">
@@ -52,8 +85,8 @@
                             <span class="profile-email" id="menu-user-email">user@example.com</span>
                         </div>
                         <div class="divider-line"></div>
+                        <button class="menu-item" onclick="openSosSettings()"><i data-feather="shield"></i> SOS Setup</button>
                         <button class="menu-item"><i data-feather="settings"></i> Settings</button>
-                        <button class="menu-item"><i data-feather="user"></i> Account</button>
                         <div class="divider-line"></div>
                         <button class="menu-item text-red" onclick="logout()"><i data-feather="log-out"></i> Sign Out</button>
                     </div>
@@ -68,7 +101,7 @@
             <div class="col-left">
                 
                 <!-- Quick Actions -->
-                <div class="glass-card module-card anim-slide-up interactive-card" style="--delay: 0.1s">
+                <div class="glass-card module-card anim-slide-up interactive-card" style="--delay: 0.05s">
                     <h3 class="card-title"><i data-feather="activity"></i> Quick Actions</h3>
                     <button class="btn-primary-green w-100 mb-3" onclick="window.location.href='chat.html'">
                         <i data-feather="play"></i> Start Therapy
@@ -80,7 +113,7 @@
                 </div>
 
                 <!-- Soundscapes -->
-                <div class="glass-card module-card mt-4 anim-slide-up interactive-card" style="--delay: 0.2s">
+                <div class="glass-card module-card mt-4 anim-slide-up interactive-card" style="--delay: 0.1s">
                     <h3 class="card-title"><i data-feather="music"></i> Soundscapes</h3>
                     <div class="sound-grid">
                         <button class="glass-btn-square" id="sound-rain" onclick="toggleSound('rain')"><i data-feather="cloud-rain"></i> <span>Rain</span></button>
@@ -94,7 +127,7 @@
                 </div>
 
                 <!-- Daily Reflection -->
-                <div class="glass-card module-card mt-4 anim-slide-up interactive-card reflection-card" style="--delay: 0.25s">
+                <div class="glass-card module-card mt-4 anim-slide-up interactive-card reflection-card" style="--delay: 0.15s">
                     <h3 class="card-title"><i data-feather="feather"></i> Daily Reflection</h3>
                     <p class="reflection-prompt" id="reflection-prompt">"What made you smile today?"</p>
                     <button class="btn-reflection" onclick="window.location.href='journal.html'">
@@ -108,7 +141,7 @@
             <div class="col-right">
                 
                 <!-- Stats Row -->
-                <div class="stats-row anim-slide-up" style="--delay: 0.3s">
+                <div class="stats-row anim-slide-up" style="--delay: 0.1s">
                     <div class="glass-card stat-card interactive-card">
                         <div class="stat-header">
                             <span class="stat-title">Mood Score</span>
@@ -137,8 +170,8 @@
                     </div>
                 </div>
 
-                <!-- Weekly Mood Chart (Dynamic Canvas) -->
-                <div class="glass-card module-card anim-slide-up chart-container interactive-card" style="--delay: 0.4s">
+                <!-- Weekly Mood Chart -->
+                <div class="glass-card module-card anim-slide-up chart-container interactive-card" style="--delay: 0.15s">
                     <h3 class="card-title"><i data-feather="bar-chart-2"></i> Weekly Mood</h3>
                     <div class="chart-wrapper">
                         <canvas id="mood-chart" width="600" height="180"></canvas>
@@ -152,36 +185,36 @@
 
         </div>
 
-        <!-- Recommended For You Row -->
-        <div class="recommended-section anim-slide-up" style="--delay: 0.5s">
-            <h3 class="section-title-small"><i data-feather="wind"></i> Recommended for You</h3>
+        <!-- Wellness Toolkit (unique from soundscapes) -->
+        <div class="recommended-section anim-slide-up" style="--delay: 0.2s">
+            <h3 class="section-title-small"><i data-feather="compass"></i> Wellness Toolkit</h3>
             <div class="rec-grid">
                 <div class="glass-card rec-card interactive-card" onclick="openBreathing()">
                     <div class="rec-icon bg-blue"><i data-feather="wind"></i></div>
                     <div class="rec-info">
-                        <h4>Box Breathing</h4>
-                        <p><i data-feather="play" class="micro-icon"></i> 5 mins</p>
+                        <h4>4-7-8 Breathing</h4>
+                        <p><i data-feather="clock" class="micro-icon"></i> 5 min exercise</p>
                     </div>
                 </div>
-                <div class="glass-card rec-card interactive-card" onclick="toggleSound('forest')">
-                    <div class="rec-icon bg-purple"><i data-feather="sun"></i></div>
+                <div class="glass-card rec-card interactive-card" onclick="window.location.href='video-session.html'">
+                    <div class="rec-icon bg-purple"><i data-feather="video"></i></div>
                     <div class="rec-info">
-                        <h4>Zen Garden</h4>
-                        <p><i data-feather="play" class="micro-icon"></i> 10 mins</p>
+                        <h4>Video Therapy</h4>
+                        <p><i data-feather="camera" class="micro-icon"></i> Face-to-face AI</p>
                     </div>
                 </div>
-                <div class="glass-card rec-card interactive-card" onclick="toggleSound('forest')">
-                    <div class="rec-icon bg-green"><i data-feather="tree"></i></div>
+                <div class="glass-card rec-card interactive-card" onclick="window.location.href='journal.html'">
+                    <div class="rec-icon bg-green"><i data-feather="edit-3"></i></div>
                     <div class="rec-info">
-                        <h4>Mindful Forest</h4>
-                        <p><i data-feather="play" class="micro-icon"></i> 15 mins</p>
+                        <h4>Gratitude Journal</h4>
+                        <p><i data-feather="pen-tool" class="micro-icon"></i> Daily writing</p>
                     </div>
                 </div>
-                <div class="glass-card rec-card interactive-card" onclick="toggleSound('waves')">
-                    <div class="rec-icon bg-teal"><i data-feather="droplet"></i></div>
+                <div class="glass-card rec-card interactive-card" onclick="window.location.href='chat.html'">
+                    <div class="rec-icon bg-teal"><i data-feather="message-circle"></i></div>
                     <div class="rec-info">
-                        <h4>Ocean Waves</h4>
-                        <p><i data-feather="play" class="micro-icon"></i> 8 mins</p>
+                        <h4>Talk to Serenity</h4>
+                        <p><i data-feather="cpu" class="micro-icon"></i> AI chat session</p>
                     </div>
                 </div>
             </div>
@@ -201,7 +234,7 @@
             toast.innerHTML = `<i data-feather="${icons[type] || 'info'}"></i><span>${message}</span>`;
             container.appendChild(toast);
             feather.replace();
-            setTimeout(() => toast.classList.add('show'), 10);
+            requestAnimationFrame(() => { requestAnimationFrame(() => toast.classList.add('show')); });
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 400);
@@ -257,8 +290,12 @@
         function drawMoodChart(data) {
             const canvas = document.getElementById('mood-chart');
             const ctx = canvas.getContext('2d');
-            const W = canvas.width;
-            const H = canvas.height;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = canvas.offsetWidth * dpr;
+            canvas.height = 180 * dpr;
+            ctx.scale(dpr, dpr);
+            const W = canvas.offsetWidth;
+            const H = 180;
             ctx.clearRect(0, 0, W, H);
 
             const padding = 30;
@@ -273,7 +310,6 @@
                 ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(W - padding, y); ctx.stroke();
             }
 
-            // Calculate points
             const points = data.map((val, i) => ({
                 x: padding + (chartW / (data.length - 1)) * i,
                 y: padding + chartH - (val / 10) * chartH
@@ -284,24 +320,22 @@
             grad.addColorStop(0, 'rgba(74, 222, 128, 0.35)');
             grad.addColorStop(1, 'rgba(74, 222, 128, 0)');
 
-            // Draw filled area
             ctx.beginPath();
             ctx.moveTo(points[0].x, H - padding);
             for (let i = 0; i < points.length - 1; i++) {
-                const cp1x = (points[i].x + points[i+1].x) / 2;
-                ctx.bezierCurveTo(cp1x, points[i].y, cp1x, points[i+1].y, points[i+1].x, points[i+1].y);
+                const cp = (points[i].x + points[i+1].x) / 2;
+                ctx.bezierCurveTo(cp, points[i].y, cp, points[i+1].y, points[i+1].x, points[i+1].y);
             }
             ctx.lineTo(points[points.length-1].x, H - padding);
             ctx.closePath();
             ctx.fillStyle = grad;
             ctx.fill();
 
-            // Draw line
             ctx.beginPath();
             ctx.moveTo(points[0].x, points[0].y);
             for (let i = 0; i < points.length - 1; i++) {
-                const cp1x = (points[i].x + points[i+1].x) / 2;
-                ctx.bezierCurveTo(cp1x, points[i].y, cp1x, points[i+1].y, points[i+1].x, points[i+1].y);
+                const cp = (points[i].x + points[i+1].x) / 2;
+                ctx.bezierCurveTo(cp, points[i].y, cp, points[i+1].y, points[i+1].x, points[i+1].y);
             }
             ctx.strokeStyle = '#4ade80';
             ctx.lineWidth = 3;
@@ -310,7 +344,6 @@
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Draw points
             points.forEach(p => {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
@@ -323,50 +356,45 @@
         }
 
         // ========== SOUNDSCAPES AUDIO ENGINE ==========
+        // Using reliable royalty-free ambient audio URLs
         const soundURLs = {
-            rain: 'https://cdn.freesound.org/previews/531/531947_6386094-lq.mp3',
-            forest: 'https://cdn.freesound.org/previews/463/463483_7548506-lq.mp3',
-            waves: 'https://cdn.freesound.org/previews/527/527684_2838619-lq.mp3'
+            rain: 'https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3',
+            forest: 'https://assets.mixkit.co/active_storage/sfx/1209/1209-preview.mp3',
+            waves: 'https://assets.mixkit.co/active_storage/sfx/189/189-preview.mp3'
         };
         let currentSound = null;
         let currentSoundName = '';
         let soundStartTime = 0;
 
         function toggleSound(name) {
-            // If same sound, stop it
-            if (currentSoundName === name && currentSound) {
-                stopSound();
-                return;
-            }
-            // Stop previous
+            if (currentSoundName === name && currentSound) { stopSound(); return; }
             if (currentSound) stopSound(true);
 
-            // Play new
             currentSound = new Audio(soundURLs[name]);
             currentSound.loop = true;
-            currentSound.volume = 0.5;
-            currentSound.play().catch(e => console.error("Audio Error:", e));
+            currentSound.volume = 0.6;
+            currentSound.play().then(() => {
+                showToast(`🎵 ${name.charAt(0).toUpperCase() + name.slice(1)} soundscape started`, 'info');
+            }).catch(e => {
+                showToast('Tap the page first to enable audio', 'error');
+                console.error("Audio Error:", e);
+            });
             currentSoundName = name;
             soundStartTime = Date.now();
 
-            // Update UI
             document.querySelectorAll('.sound-grid .glass-btn-square').forEach(b => b.classList.remove('active'));
             document.getElementById('sound-' + name).classList.add('active');
             document.getElementById('now-playing').style.display = 'flex';
             document.getElementById('now-playing-text').textContent = 'Now Playing: ' + name.charAt(0).toUpperCase() + name.slice(1);
-            showToast(`🎵 ${name.charAt(0).toUpperCase() + name.slice(1)} soundscape started`, 'info');
         }
 
         function stopSound(silent) {
             if (currentSound) {
                 currentSound.pause();
-                currentSound = null;
-
-                // Log activity if played > 30 seconds
+                currentSound.currentTime = 0;
                 const elapsed = (Date.now() - soundStartTime) / 1000;
-                if (elapsed > 30) {
-                    logActivity(currentSoundName + ' Soundscape', Math.round(elapsed));
-                }
+                if (elapsed > 30) logActivity(currentSoundName + ' Soundscape', Math.round(elapsed));
+                currentSound = null;
             }
             currentSoundName = '';
             document.querySelectorAll('.sound-grid .glass-btn-square').forEach(b => b.classList.remove('active'));
@@ -377,7 +405,6 @@
         // ========== BREATHING EXERCISE ==========
         let breathingActive = false;
         let breathCycle = 0;
-        let breathPhase = 0;
         let breathTimer = null;
 
         function openBreathing() {
@@ -386,6 +413,7 @@
             document.getElementById('breath-cycles').textContent = 'Cycle 0 / 3';
             document.getElementById('start-breathing-btn').style.display = 'block';
             document.getElementById('breath-circle').className = 'breath-circle';
+            feather.replace();
         }
 
         function closeBreathing() {
@@ -402,7 +430,6 @@
         function startBreathing() {
             breathingActive = true;
             breathCycle = 0;
-            breathPhase = 0;
             document.getElementById('start-breathing-btn').style.display = 'none';
             runBreathCycle();
         }
@@ -427,7 +454,6 @@
 
             let phaseIdx = 0;
             let secondsLeft = phases[0].duration;
-
             document.getElementById('breath-instruction').textContent = phases[0].label;
             document.getElementById('breath-circle').className = 'breath-circle ' + phases[0].anim;
             document.getElementById('breath-timer').textContent = secondsLeft;
@@ -436,7 +462,6 @@
             breathTimer = setInterval(() => {
                 secondsLeft--;
                 document.getElementById('breath-timer').textContent = Math.max(0, secondsLeft);
-
                 if (secondsLeft <= 0) {
                     phaseIdx++;
                     if (phaseIdx >= phases.length) {
@@ -453,6 +478,49 @@
             }, 1000);
         }
 
+        // ========== SOS SYSTEM ==========
+        function openSosSettings() {
+            document.getElementById('sos-overlay').classList.add('show');
+            // Load saved settings
+            const saved = JSON.parse(localStorage.getItem('serenity_sos') || '{}');
+            if (saved.name) document.getElementById('sos-contact-name').value = saved.name;
+            if (saved.phone) document.getElementById('sos-contact-phone').value = saved.phone;
+            if (saved.message) document.getElementById('sos-message').value = saved.message;
+            feather.replace();
+        }
+
+        function closeSosSettings() {
+            document.getElementById('sos-overlay').classList.remove('show');
+        }
+
+        function saveSosSettings() {
+            const settings = {
+                name: document.getElementById('sos-contact-name').value,
+                phone: document.getElementById('sos-contact-phone').value,
+                message: document.getElementById('sos-message').value
+            };
+            localStorage.setItem('serenity_sos', JSON.stringify(settings));
+            closeSosSettings();
+            showToast('SOS settings saved securely ✅', 'success');
+        }
+
+        function triggerSOS() {
+            const saved = JSON.parse(localStorage.getItem('serenity_sos') || '{}');
+            if (!saved.phone) {
+                showToast('⚠️ Please set up SOS first', 'error', 3000);
+                openSosSettings();
+                return;
+            }
+            // Show confirmation
+            const confirmed = confirm(`🆘 EMERGENCY SOS\n\nThis will call ${saved.name || 'your contact'} at ${saved.phone}.\n\nMessage: "${saved.message || 'I need help.'}"\n\nProceed?`);
+            if (confirmed) {
+                window.open(`tel:${saved.phone}`, '_self');
+                showToast(`🆘 Calling ${saved.name}...`, 'error', 5000);
+                // Also ping backend
+                fetch('/api/sos', { method: 'POST', headers: { 'Authorization': `Bearer ${getToken()}` } });
+            }
+        }
+
         // ========== API HELPERS ==========
         function getToken() { return localStorage.getItem('serenity_token'); }
 
@@ -463,7 +531,7 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
                     body: JSON.stringify({ activity: name, duration: duration })
                 });
-            } catch(e) { console.error(e); }
+            } catch(e) {}
         }
 
         // ========== TIME-AWARE GREETING ==========
@@ -477,10 +545,7 @@
         // ========== DASHBOARD DATA FETCHING ==========
         async function fetchDashboardData() {
             const token = getToken();
-            if (!token) {
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!token) { window.location.href = 'index.html'; return; }
             
             try {
                 const response = await fetch('/api/dashboard/data', {
@@ -499,13 +564,11 @@
                     document.getElementById('val-streak').innerText = `${data.stats.streak} Days`;
                     document.getElementById('val-entries').innerText = data.stats.totalEntries;
 
-                    // Daily prompt
                     if (data.dailyPrompt) {
                         document.getElementById('daily-prompt-text').innerText = data.dailyPrompt;
                         document.getElementById('reflection-prompt').innerText = `"${data.dailyPrompt}"`;
                     }
 
-                    // Dynamic Mood Chart
                     if (data.moodHistory) {
                         drawMoodChart(data.moodHistory);
                     }
@@ -514,7 +577,7 @@
                     window.location.href = 'index.html';
                 }
             } catch (e) {
-                console.error('Failed to fetch dashboard data', e);
+                console.error('Dashboard fetch error', e);
             }
         }
 
@@ -524,17 +587,6 @@
             setTimeout(() => { window.location.href = 'index.html'; }, 800);
         }
 
-        async function triggerSOS() {
-            try {
-                const response = await fetch('/api/sos', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const data = await response.json();
-                if (data.success) showToast(data.action, 'error', 8000);
-            } catch(e) { console.error(e) }
-        }
-
         function toggleProfileMenu() {
             document.getElementById('profile-menu').classList.toggle('show-menu');
         }
@@ -542,9 +594,7 @@
         window.addEventListener('click', (e) => {
             if (!e.target.closest('.profile-dropdown-container')) {
                 const menu = document.getElementById('profile-menu');
-                if(menu && menu.classList.contains('show-menu')) {
-                    menu.classList.remove('show-menu');
-                }
+                if(menu && menu.classList.contains('show-menu')) menu.classList.remove('show-menu');
             }
         });
 
