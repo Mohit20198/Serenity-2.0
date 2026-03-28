@@ -118,6 +118,7 @@
     </style>
 </head>
 <body class="journal-page">
+    <canvas id="particles-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none;"></canvas>
     <nav style="width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center;">
         <a href="dashboard.html" class="back-to-dash">
             <i data-feather="chevron-left"></i> Back to Dashboard
@@ -143,6 +144,52 @@
 
     <script>
         feather.replace();
+
+        // Particle Background
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particlesArray = [];
+        let mouse = { x: null, y: null, radius: 250 };
+        function resizeCanvas() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; initParticles(); }
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+        class Particle {
+            constructor(x, y) {
+                this.baseX = x; this.baseY = y; this.x = x; this.y = y; this.size = 1.2;
+                const alpha = Math.random() * 0.4 + 0.1;
+                this.color = `rgba(74, 222, 128, ${alpha})`;
+            }
+            update() {
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x; let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        const fX = dx / distance; const fY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        this.x -= fX * force * 12; this.y -= fY * force * 12;
+                    }
+                }
+                this.x += (this.baseX - this.x) * 0.05; this.y += (this.baseY - this.y) * 0.05;
+            }
+            draw() { pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fillStyle = this.color; pCtx.fill(); }
+        }
+        function initParticles() {
+            particlesArray = [];
+            const spacing = 35; let row = 0;
+            for (let y = -spacing; y < pCanvas.height + spacing; y += spacing) {
+                let offsetX = (row % 2 === 0) ? 0 : spacing / 2;
+                for (let x = -spacing; x < pCanvas.width + spacing; x += spacing) { particlesArray.push(new Particle(x + offsetX, y)); }
+                row++;
+            }
+        }
+        pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; initParticles();
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
 
         // Check Auth
         if (!localStorage.getItem('serenity_token') && !navigator.webdriver) {

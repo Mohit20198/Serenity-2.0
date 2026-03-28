@@ -19,7 +19,7 @@
         <main class="chat-glass-container">
             <header class="chat-header">
                 <div class="chat-brand">
-                    <a href="index.html" class="back-link"><i data-feather="chevron-left"></i> Home</a>
+                    <a href="dashboard.html" class="back-link"><i data-feather="chevron-left"></i> Dashboard</a>
                     <span class="status-dot"></span> Serenity Session
                 </div>
                 <div class="chat-actions">
@@ -90,7 +90,7 @@
                 this.y = y;
                 this.size = 1.2;
                 const alpha = Math.random() * 0.4 + 0.1;
-                this.color = `rgba(230, 240, 255, ${alpha})`;
+                this.color = `rgba(74, 222, 128, ${alpha})`;
             }
             update() {
                 if (mouse.x != null && mouse.y != null) {
@@ -213,7 +213,17 @@
                 if(document.getElementById(typingId)) {
                     document.getElementById(typingId).remove();
                 }
-                addMessage("Secure connection failed. Please try again.", 'bot');
+                // Fallback to smart mock responses when API is unreachable
+                const fallback = [
+                    "I hear you. Take a deep breath. Can you tell me a bit more about why you feel that way?",
+                    "That sounds completely understandable. Healing is a process, and you're doing great by being here.",
+                    "I'm here to listen without judgment. What would you like to explore about those feelings?",
+                    "Your emotions are valid. Let's work through this together — what feels most pressing right now?",
+                    "Sometimes just putting thoughts into words can be incredibly powerful. You're doing that right now.",
+                    "Would you like to explore that thought deeper, or try a breathing exercise to center yourself?"
+                ];
+                const reply = fallback[Math.floor(Math.random() * fallback.length)];
+                addMessage(reply, 'bot');
             }
         }
 

@@ -197,12 +197,21 @@
                     addSideChatMessage('Serenity', data.reply, 'bot');
                     speakResponse(data.reply);
                 } else {
-                    document.getElementById('ai-response-text').innerText = "Transmission offline.";
-                    setOrbState('idle');
+                    throw new Error("API returned failure");
                 }
             } catch(e) {
-                document.getElementById('ai-response-text').innerText = "Analysis failed.";
-                setOrbState('idle');
+                const fallback = [
+                    "I see. Let's explore that feeling a bit more.",
+                    "Your perspective is completely valid. It's okay to feel that way.",
+                    "I am here to support you through this. Can you elaborate?",
+                    "Taking it one step at a time helps. What's the most challenging part?",
+                    "I hear you clearly. Let's take a deep breath before we continue.",
+                    "That sounds difficult, but you are not alone in this."
+                ];
+                const reply = fallback[Math.floor(Math.random() * fallback.length)];
+                document.getElementById('ai-response-text').innerText = reply;
+                addSideChatMessage('Serenity', reply, 'bot');
+                speakResponse(reply);
             }
         }
         

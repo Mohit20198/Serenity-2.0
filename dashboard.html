@@ -254,7 +254,7 @@
             constructor(x, y) {
                 this.baseX = x; this.baseY = y; this.x = x; this.y = y; this.size = 1.2;
                 const alpha = Math.random() * 0.4 + 0.1;
-                this.color = `rgba(230, 240, 255, ${alpha})`;
+                this.color = `rgba(74, 222, 128, ${alpha})`;
             }
             update() {
                 if (mouse.x != null && mouse.y != null) {
@@ -507,16 +507,13 @@
         function triggerSOS() {
             const saved = JSON.parse(localStorage.getItem('serenity_sos') || '{}');
             if (!saved.phone) {
-                showToast('⚠️ Please set up SOS first', 'error', 3000);
-                openSosSettings();
+                showToast('⚠️ Set up your SOS contact in Profile first', 'error', 4000);
                 return;
             }
-            // Show confirmation
             const confirmed = confirm(`🆘 EMERGENCY SOS\n\nThis will call ${saved.name || 'your contact'} at ${saved.phone}.\n\nMessage: "${saved.message || 'I need help.'}"\n\nProceed?`);
             if (confirmed) {
                 window.open(`tel:${saved.phone}`, '_self');
                 showToast(`🆘 Calling ${saved.name}...`, 'error', 5000);
-                // Also ping backend
                 fetch('/api/sos', { method: 'POST', headers: { 'Authorization': `Bearer ${getToken()}` } });
             }
         }
@@ -560,7 +557,13 @@
                     document.getElementById('menu-user-email').innerText = data.user.email;
                     document.getElementById('avatar-img').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.user.name}&backgroundColor=4ade80`;
                     
+                    const moodVal = parseFloat(data.stats.moodScore);
                     document.getElementById('val-mood').innerText = data.stats.moodScore;
+                    // Dynamic mood color
+                    const moodEl = document.getElementById('val-mood');
+                    if (moodVal >= 7) moodEl.style.color = '#4ade80';
+                    else if (moodVal >= 4) moodEl.style.color = '#fbbf24';
+                    else moodEl.style.color = '#f87171';
                     document.getElementById('val-streak').innerText = `${data.stats.streak} Days`;
                     document.getElementById('val-entries').innerText = data.stats.totalEntries;
 
