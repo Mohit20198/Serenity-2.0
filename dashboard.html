@@ -5,21 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Serenity | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <!-- Feather icons -->
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body class="dashboard-body">
-    <!-- Particle Canvas Background -->
     <canvas id="particles-canvas"></canvas>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Breathing Exercise Overlay -->
+    <div class="breathing-overlay" id="breathing-overlay">
+        <div class="breathing-content">
+            <button class="breathing-close" onclick="closeBreathing()"><i data-feather="x"></i></button>
+            <h2 class="breathing-title">4-7-8 Breathing</h2>
+            <p class="breathing-subtitle" id="breath-instruction">Tap to begin</p>
+            <div class="breath-circle-container">
+                <div class="breath-circle" id="breath-circle">
+                    <span id="breath-timer">0</span>
+                </div>
+            </div>
+            <p class="breath-cycle-count" id="breath-cycles">Cycle 0 / 3</p>
+            <button class="btn-primary-green" id="start-breathing-btn" onclick="startBreathing()" style="max-width:200px;margin:0 auto;">Begin</button>
+        </div>
+    </div>
 
     <div class="dashboard-container">
         <!-- Header -->
         <header class="dash-header flex-between">
             <div class="user-welcome">
                 <h1 id="user-greeting">Welcome, User</h1>
-                <p>Your safe space is ready.</p>
+                <p id="daily-prompt-text">Your safe space is ready.</p>
             </div>
             <div class="header-actions">
                 <button class="glass-btn outline-green" onclick="window.location.href='video-session.html'"><i data-feather="video"></i> Video Mode</button>
@@ -57,8 +74,8 @@
                         <i data-feather="play"></i> Start Therapy
                     </button>
                     <div class="action-grid">
-                        <button class="glass-btn-square"><i data-feather="pen-tool"></i> <span>Journal</span></button>
-                        <button class="glass-btn-square"><i data-feather="wind"></i> <span>Breathe</span></button>
+                        <button class="glass-btn-square" onclick="window.location.href='journal.html'"><i data-feather="pen-tool"></i> <span>Journal</span></button>
+                        <button class="glass-btn-square" onclick="openBreathing()"><i data-feather="wind"></i> <span>Breathe</span></button>
                     </div>
                 </div>
 
@@ -66,10 +83,23 @@
                 <div class="glass-card module-card mt-4 anim-slide-up interactive-card" style="--delay: 0.2s">
                     <h3 class="card-title"><i data-feather="music"></i> Soundscapes</h3>
                     <div class="sound-grid">
-                        <button class="glass-btn-square active"><i data-feather="cloud-rain"></i> <span>Rain</span></button>
-                        <button class="glass-btn-square"><i data-feather="map-pin"></i> <span>Forest</span></button>
-                        <button class="glass-btn-square"><i data-feather="droplet"></i> <span>Waves</span></button>
+                        <button class="glass-btn-square" id="sound-rain" onclick="toggleSound('rain')"><i data-feather="cloud-rain"></i> <span>Rain</span></button>
+                        <button class="glass-btn-square" id="sound-forest" onclick="toggleSound('forest')"><i data-feather="map-pin"></i> <span>Forest</span></button>
+                        <button class="glass-btn-square" id="sound-waves" onclick="toggleSound('waves')"><i data-feather="droplet"></i> <span>Waves</span></button>
                     </div>
+                    <div class="now-playing" id="now-playing" style="display:none;">
+                        <div class="eq-bars"><span></span><span></span><span></span><span></span></div>
+                        <span id="now-playing-text">Now Playing: Rain</span>
+                    </div>
+                </div>
+
+                <!-- Daily Reflection -->
+                <div class="glass-card module-card mt-4 anim-slide-up interactive-card reflection-card" style="--delay: 0.25s">
+                    <h3 class="card-title"><i data-feather="feather"></i> Daily Reflection</h3>
+                    <p class="reflection-prompt" id="reflection-prompt">"What made you smile today?"</p>
+                    <button class="btn-reflection" onclick="window.location.href='journal.html'">
+                        <i data-feather="edit-3"></i> Write in Journal
+                    </button>
                 </div>
 
             </div>
@@ -91,7 +121,7 @@
                     <div class="glass-card stat-card interactive-card">
                         <div class="stat-header">
                             <span class="stat-title">Streak</span>
-                            <i data-feather="flame" class="icon-orange"></i>
+                            <i data-feather="zap" class="icon-orange"></i>
                         </div>
                         <div class="stat-value" id="val-streak">--</div>
                         <div class="stat-desc">Keep it up!</div>
@@ -107,24 +137,11 @@
                     </div>
                 </div>
 
-                <!-- Weekly Mood Chart -->
+                <!-- Weekly Mood Chart (Dynamic Canvas) -->
                 <div class="glass-card module-card anim-slide-up chart-container interactive-card" style="--delay: 0.4s">
                     <h3 class="card-title"><i data-feather="bar-chart-2"></i> Weekly Mood</h3>
-                    <div class="chart-mockup">
-                        <svg width="100%" height="150" viewBox="0 0 500 150" preserveAspectRatio="none">
-                            <defs>
-                                <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="#4ade80" stop-opacity="0.35"/>
-                                    <stop offset="100%" stop-color="#4ade80" stop-opacity="0"/>
-                                </linearGradient>
-                            </defs>
-                            <path d="M0,30 L500,30 M0,70 L500,70 M0,110 L500,110" stroke="rgba(255,255,255,0.05)" stroke-width="1" fill="none" class="chart-grid-lines"/>
-                            <path d="M0,150 L0,100 C50,80 100,120 150,90 C200,60 250,110 300,70 C350,30 400,90 450,50 L500,40 L500,150 Z" fill="url(#glow)"/>
-                            <path d="M0,100 C50,80 100,120 150,90 C200,60 250,110 300,70 C350,30 400,90 450,50 L500,40" fill="none" class="chart-line" stroke="#4ade80" stroke-width="3"/>
-                            <circle cx="150" cy="90" r="5" fill="#4ade80" class="plot-point" style="animation-delay:0.8s"/>
-                            <circle cx="300" cy="70" r="5" fill="#4ade80" class="plot-point" style="animation-delay:1.1s"/>
-                            <circle cx="450" cy="50" r="5" fill="#4ade80" class="plot-point" style="animation-delay:1.4s"/>
-                        </svg>
+                    <div class="chart-wrapper">
+                        <canvas id="mood-chart" width="600" height="180"></canvas>
                         <div class="chart-x-axis">
                             <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
                         </div>
@@ -139,28 +156,28 @@
         <div class="recommended-section anim-slide-up" style="--delay: 0.5s">
             <h3 class="section-title-small"><i data-feather="wind"></i> Recommended for You</h3>
             <div class="rec-grid">
-                <div class="glass-card rec-card interactive-card" onclick="triggerActivity('Box Breathing')">
+                <div class="glass-card rec-card interactive-card" onclick="openBreathing()">
                     <div class="rec-icon bg-blue"><i data-feather="wind"></i></div>
                     <div class="rec-info">
                         <h4>Box Breathing</h4>
                         <p><i data-feather="play" class="micro-icon"></i> 5 mins</p>
                     </div>
                 </div>
-                <div class="glass-card rec-card interactive-card" onclick="triggerActivity('Zen Garden')">
+                <div class="glass-card rec-card interactive-card" onclick="toggleSound('forest')">
                     <div class="rec-icon bg-purple"><i data-feather="sun"></i></div>
                     <div class="rec-info">
                         <h4>Zen Garden</h4>
                         <p><i data-feather="play" class="micro-icon"></i> 10 mins</p>
                     </div>
                 </div>
-                <div class="glass-card rec-card interactive-card" onclick="triggerActivity('Mindful Forest')">
+                <div class="glass-card rec-card interactive-card" onclick="toggleSound('forest')">
                     <div class="rec-icon bg-green"><i data-feather="tree"></i></div>
                     <div class="rec-info">
                         <h4>Mindful Forest</h4>
                         <p><i data-feather="play" class="micro-icon"></i> 15 mins</p>
                     </div>
                 </div>
-                <div class="glass-card rec-card interactive-card" onclick="triggerActivity('Ocean Waves')">
+                <div class="glass-card rec-card interactive-card" onclick="toggleSound('waves')">
                     <div class="rec-icon bg-teal"><i data-feather="droplet"></i></div>
                     <div class="rec-info">
                         <h4>Ocean Waves</h4>
@@ -172,11 +189,26 @@
 
     </div>
 
-    <!-- Logic -->
     <script>
         feather.replace();
 
-        // Canvas Particles Background Logic
+        // ========== TOAST NOTIFICATION SYSTEM ==========
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
+            toast.innerHTML = `<i data-feather="${icons[type] || 'info'}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            feather.replace();
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, duration);
+        }
+
+        // ========== PARTICLES BACKGROUND ==========
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particlesArray = [];
@@ -196,10 +228,9 @@
                     let dx = mouse.x - this.x; let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance; const forceDirectionY = dy / distance;
+                        const fX = dx / distance; const fY = dy / distance;
                         const force = (mouse.radius - distance) / mouse.radius;
-                        const pushStrength = force * 6;
-                        this.x -= forceDirectionX * pushStrength; this.y -= forceDirectionY * pushStrength;
+                        this.x -= fX * force * 6; this.y -= fY * force * 6;
                     }
                 }
                 this.x += (this.baseX - this.x) * 0.05; this.y += (this.baseY - this.y) * 0.05;
@@ -222,11 +253,231 @@
         }
         animateParticles();
 
-        // Dashboard Data Fetching via the Backend Node Server
+        // ========== DYNAMIC MOOD CHART (Canvas) ==========
+        function drawMoodChart(data) {
+            const canvas = document.getElementById('mood-chart');
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+
+            const padding = 30;
+            const chartW = W - padding * 2;
+            const chartH = H - padding * 2;
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 3; i++) {
+                const y = padding + (chartH / 3) * i;
+                ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(W - padding, y); ctx.stroke();
+            }
+
+            // Calculate points
+            const points = data.map((val, i) => ({
+                x: padding + (chartW / (data.length - 1)) * i,
+                y: padding + chartH - (val / 10) * chartH
+            }));
+
+            // Gradient fill
+            const grad = ctx.createLinearGradient(0, padding, 0, H);
+            grad.addColorStop(0, 'rgba(74, 222, 128, 0.35)');
+            grad.addColorStop(1, 'rgba(74, 222, 128, 0)');
+
+            // Draw filled area
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, H - padding);
+            for (let i = 0; i < points.length - 1; i++) {
+                const cp1x = (points[i].x + points[i+1].x) / 2;
+                ctx.bezierCurveTo(cp1x, points[i].y, cp1x, points[i+1].y, points[i+1].x, points[i+1].y);
+            }
+            ctx.lineTo(points[points.length-1].x, H - padding);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Draw line
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 0; i < points.length - 1; i++) {
+                const cp1x = (points[i].x + points[i+1].x) / 2;
+                ctx.bezierCurveTo(cp1x, points[i].y, cp1x, points[i+1].y, points[i+1].x, points[i+1].y);
+            }
+            ctx.strokeStyle = '#4ade80';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = 'rgba(74, 222, 128, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Draw points
+            points.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#4ade80';
+                ctx.shadowColor = 'rgba(74, 222, 128, 0.8)';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+        }
+
+        // ========== SOUNDSCAPES AUDIO ENGINE ==========
+        const soundURLs = {
+            rain: 'https://cdn.freesound.org/previews/531/531947_6386094-lq.mp3',
+            forest: 'https://cdn.freesound.org/previews/463/463483_7548506-lq.mp3',
+            waves: 'https://cdn.freesound.org/previews/527/527684_2838619-lq.mp3'
+        };
+        let currentSound = null;
+        let currentSoundName = '';
+        let soundStartTime = 0;
+
+        function toggleSound(name) {
+            // If same sound, stop it
+            if (currentSoundName === name && currentSound) {
+                stopSound();
+                return;
+            }
+            // Stop previous
+            if (currentSound) stopSound(true);
+
+            // Play new
+            currentSound = new Audio(soundURLs[name]);
+            currentSound.loop = true;
+            currentSound.volume = 0.5;
+            currentSound.play().catch(e => console.error("Audio Error:", e));
+            currentSoundName = name;
+            soundStartTime = Date.now();
+
+            // Update UI
+            document.querySelectorAll('.sound-grid .glass-btn-square').forEach(b => b.classList.remove('active'));
+            document.getElementById('sound-' + name).classList.add('active');
+            document.getElementById('now-playing').style.display = 'flex';
+            document.getElementById('now-playing-text').textContent = 'Now Playing: ' + name.charAt(0).toUpperCase() + name.slice(1);
+            showToast(`🎵 ${name.charAt(0).toUpperCase() + name.slice(1)} soundscape started`, 'info');
+        }
+
+        function stopSound(silent) {
+            if (currentSound) {
+                currentSound.pause();
+                currentSound = null;
+
+                // Log activity if played > 30 seconds
+                const elapsed = (Date.now() - soundStartTime) / 1000;
+                if (elapsed > 30) {
+                    logActivity(currentSoundName + ' Soundscape', Math.round(elapsed));
+                }
+            }
+            currentSoundName = '';
+            document.querySelectorAll('.sound-grid .glass-btn-square').forEach(b => b.classList.remove('active'));
+            document.getElementById('now-playing').style.display = 'none';
+            if (!silent) showToast('Soundscape stopped', 'info');
+        }
+
+        // ========== BREATHING EXERCISE ==========
+        let breathingActive = false;
+        let breathCycle = 0;
+        let breathPhase = 0;
+        let breathTimer = null;
+
+        function openBreathing() {
+            document.getElementById('breathing-overlay').classList.add('show');
+            document.getElementById('breath-instruction').textContent = 'Tap Begin to start';
+            document.getElementById('breath-cycles').textContent = 'Cycle 0 / 3';
+            document.getElementById('start-breathing-btn').style.display = 'block';
+            document.getElementById('breath-circle').className = 'breath-circle';
+        }
+
+        function closeBreathing() {
+            document.getElementById('breathing-overlay').classList.remove('show');
+            breathingActive = false;
+            clearInterval(breathTimer);
+            if (breathCycle > 0) {
+                logActivity('Breathing Exercise', breathCycle * 19);
+                showToast(`🧘 Completed ${breathCycle} breathing cycles!`, 'success');
+            }
+            breathCycle = 0;
+        }
+
+        function startBreathing() {
+            breathingActive = true;
+            breathCycle = 0;
+            breathPhase = 0;
+            document.getElementById('start-breathing-btn').style.display = 'none';
+            runBreathCycle();
+        }
+
+        function runBreathCycle() {
+            if (!breathingActive || breathCycle >= 3) {
+                if (breathCycle >= 3) {
+                    document.getElementById('breath-instruction').textContent = 'Session Complete ✨';
+                    document.getElementById('breath-circle').className = 'breath-circle';
+                    logActivity('Breathing Exercise', 3 * 19);
+                    showToast('🧘 Breathing session complete! Great work.', 'success');
+                    setTimeout(() => closeBreathing(), 2000);
+                }
+                return;
+            }
+
+            const phases = [
+                { label: 'Breathe In...', duration: 4, anim: 'inhale' },
+                { label: 'Hold...', duration: 7, anim: 'hold' },
+                { label: 'Breathe Out...', duration: 8, anim: 'exhale' }
+            ];
+
+            let phaseIdx = 0;
+            let secondsLeft = phases[0].duration;
+
+            document.getElementById('breath-instruction').textContent = phases[0].label;
+            document.getElementById('breath-circle').className = 'breath-circle ' + phases[0].anim;
+            document.getElementById('breath-timer').textContent = secondsLeft;
+
+            clearInterval(breathTimer);
+            breathTimer = setInterval(() => {
+                secondsLeft--;
+                document.getElementById('breath-timer').textContent = Math.max(0, secondsLeft);
+
+                if (secondsLeft <= 0) {
+                    phaseIdx++;
+                    if (phaseIdx >= phases.length) {
+                        breathCycle++;
+                        document.getElementById('breath-cycles').textContent = `Cycle ${breathCycle} / 3`;
+                        clearInterval(breathTimer);
+                        runBreathCycle();
+                        return;
+                    }
+                    secondsLeft = phases[phaseIdx].duration;
+                    document.getElementById('breath-instruction').textContent = phases[phaseIdx].label;
+                    document.getElementById('breath-circle').className = 'breath-circle ' + phases[phaseIdx].anim;
+                }
+            }, 1000);
+        }
+
+        // ========== API HELPERS ==========
+        function getToken() { return localStorage.getItem('serenity_token'); }
+
+        async function logActivity(name, duration) {
+            try {
+                await fetch('/api/activity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+                    body: JSON.stringify({ activity: name, duration: duration })
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // ========== TIME-AWARE GREETING ==========
+        function getTimeGreeting() {
+            const hour = new Date().getHours();
+            if (hour < 12) return 'Good morning';
+            if (hour < 17) return 'Good afternoon';
+            return 'Good evening';
+        }
+
+        // ========== DASHBOARD DATA FETCHING ==========
         async function fetchDashboardData() {
-            const token = localStorage.getItem('serenity_token');
-            if(!token) {
-                // If not logged in, redirect home
+            const token = getToken();
+            if (!token) {
                 window.location.href = 'index.html';
                 return;
             }
@@ -238,7 +489,8 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    document.getElementById('user-greeting').innerText = `Welcome, ${data.user.name}`;
+                    const firstName = data.user.name.split(' ')[0];
+                    document.getElementById('user-greeting').innerText = `${getTimeGreeting()}, ${firstName}`;
                     document.getElementById('menu-user-name').innerText = data.user.name;
                     document.getElementById('menu-user-email').innerText = data.user.email;
                     document.getElementById('avatar-img').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.user.name}&backgroundColor=4ade80`;
@@ -247,63 +499,40 @@
                     document.getElementById('val-streak').innerText = `${data.stats.streak} Days`;
                     document.getElementById('val-entries').innerText = data.stats.totalEntries;
 
-                    // Fetch actual Journal count from specific endpoint if status is out of sync
-                    fetchJournalCount();
+                    // Daily prompt
+                    if (data.dailyPrompt) {
+                        document.getElementById('daily-prompt-text').innerText = data.dailyPrompt;
+                        document.getElementById('reflection-prompt').innerText = `"${data.dailyPrompt}"`;
+                    }
+
+                    // Dynamic Mood Chart
+                    if (data.moodHistory) {
+                        drawMoodChart(data.moodHistory);
+                    }
                 } else {
                     localStorage.removeItem('serenity_token');
                     window.location.href = 'index.html';
                 }
             } catch (e) {
-            }
-        }
-
-        async function fetchJournalCount() {
-            const token = localStorage.getItem('serenity_token');
-            const res = await fetch('/api/journal/count', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if(data.success) {
-                document.getElementById('val-entries').innerText = data.count;
+                console.error('Failed to fetch dashboard data', e);
             }
         }
 
         function logout() {
             localStorage.clear();
-            window.location.href = 'index.html';
+            showToast('Signed out successfully', 'info');
+            setTimeout(() => { window.location.href = 'index.html'; }, 800);
         }
 
         async function triggerSOS() {
-            const token = localStorage.getItem('serenity_token');
             try {
                 const response = await fetch('/api/sos', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
                 });
                 const data = await response.json();
-                if (data.success) alert(data.action);
+                if (data.success) showToast(data.action, 'error', 8000);
             } catch(e) { console.error(e) }
-        }
-
-        async function triggerActivity(activityName) {
-            const token = localStorage.getItem('serenity_token');
-            try {
-                const response = await fetch('/api/activity', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` 
-                    },
-                    body: JSON.stringify({ activity: activityName })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    alert(`${activityName} Session Completed! Your streak has increased.`);
-                    fetchDashboardData(); 
-                }
-            } catch (err) {
-                console.error(err);
-            }
         }
 
         function toggleProfileMenu() {
@@ -320,7 +549,6 @@
         });
 
         fetchDashboardData();
-
     </script>
 </body>
 </html>
